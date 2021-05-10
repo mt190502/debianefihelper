@@ -1,0 +1,81 @@
+#!/bin/bash
+. /etc/debianefistub.conf
+
+if [[ -n $ROOTDISK ]]; then
+  	ROOTUUID="$(blkid | grep $ROOTDISK | grep -o ' UUID="[a-zA-Z0-9]*-[a-zA-Z0-9]*-[a-zA-Z0-9]*-[a-zA-Z0-9]-*[a-zA-Z0-9]*-[a-zA-Z0-9]*"' | cut -d\" -f2)"     
+else
+	ROOTUUID="$(blkid | grep $(mount | grep " / " | cut -d" " -f1) | grep -o ' UUID="[a-zA-Z0-9]*-[a-zA-Z0-9]*-[a-zA-Z0-9]*-[a-zA-Z0-9]-*[a-zA-Z0-9]*-[a-zA-Z0-9]*"' | cut -d\" -f2)"
+fi
+
+if [[ -n $EFIPART ]]; then
+	echo ""
+else
+	if [[ "$(blkid | grep EFI | cut -d':' -f1 | grep -o nvme)" == "nvme" ]]; then
+		EFIPART="$(blkid | grep EFI | cut -d":" -f1 | sed 's/p/ -p /g')"
+	elif [[ "$(blkid | grep EFI | cut -d":" -f1 | grep -o sd)" == "sd" ]]; then
+		disk="$(blkid | grep sda3 | cut -d":" -f1 | cut -d "/" -f3 | grep -o '[a-z]*')"
+		part="$(blkid | grep sda3 | cut -d":" -f1 | cut -d "/" -f3 | grep -o '[0-9]*')"
+		EFIPART="/dev/$disk -p $part"
+	elif [[ "$(blkid | grep EFI | cut -d\: -f1 | grep -o mmcblk)" == "mmcblk" ]]; then
+		EFIPART="$(blkid | grep EFI | cut -d":" -f1 | sed 's/p/ -p /g')"
+	fi
+fi
+
+TARGET="/boot/efi/$(cat /etc/machine-id)"
+
+[[ -d $TARGET ]] || mkdir -p $TARGET
+
+_install(){
+	echo "Installing kernel (version $1)"
+	nkernel="/$(cat /etc/machine-id)/vmlinuz-$1"
+	ninitrd="\\$(cat /etc/machine-id)\initrd-$1"
+
+	rm -f $TARGET/{vmlinuz-$1,initrd-$1}
+
+	cp /boot/vmlinuz-$1 $TARGET/
+	cp /boot/initrd.img-$1 $TARGET/
+	
+	[[ "$(efibootmgr | grep $1)" == "$1" ]] && efibootmgr -Bb $(efibootmgr | grep $1 | cut -d '*' -f1 | sed "s/Boot//g")
+
+	efibootmgr -d $EFIPART \
+		-c -L "$NAME ($1)" \
+		-l $nkernel \
+		-u "root=UUID=$ROOTUUID initrd=$ninitrd $PARAM" -v
+}
+
+_remove(){
+	echo "Removing kernel (version $1)"
+        nkernel="/$(cat /etc/machine-id)/vmlinuz-$1"
+        ninitrd="\\$(cat /etc/machine-id)\initrd-$1"
+
+        rm -f $TARGET/{vmlinuz-$1,initrd-$1}
+	
+	efibootmgr -Bb $(efibootmgr | grep $1 | cut -d '*' -f1 | sed "s/Boot//g")
+}
+
+_firstsetup(){
+	if [[ -e "/etc/debianefistub.conf" ]]; then
+		echo -e "Config file is available in /etc.\nDo you want to continue?\nPress <Enter> to continue or press <Ctrl+C> to cancel operation"
+		read
+	fi
+	echo -e '#!/bin/bash\n/usr/local/bin/efstub install $1' > /etc/kernel/postinst.d/efstub
+	chmod +x /etc/kernel/postinst.d/efstub
+        echo -e '#!/bin/bash\n/usr/local/bin/efstub remove $1' > /etc/kernel/postrm.d/efstub
+	chmod +x /etc/kernel/postrm.d/efstub
+	echo """ROOTDISK=\"$(mount | grep " / " | cut -d\  -f1)\"""" > /etc/debianefistub.conf
+	echo """EFIPART=\"$EFIPART\"""" >> /etc/debianefistub.conf
+	echo "NAME=\"\$(lsb_release -d | awk '{print \$2,\$3}')\"" >> /etc/debianefistub.conf
+	echo "PARAM=\"$(cat /proc/cmdline | cut -d ' ' -f 3-)\"" >> /etc/debianefistub.conf
+}
+
+case $1 in
+	install)
+		_install $2
+	;;
+	remove)
+		_remove $2
+	;;
+	first)
+		_firstsetup
+	;;
+esac
