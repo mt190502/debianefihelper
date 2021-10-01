@@ -2,9 +2,9 @@
 . /etc/debianefistub.conf
 
 if [[ -n $ROOTDISK ]]; then
-  	ROOTUUID="$(blkid | grep $ROOTDISK | grep -o ' UUID="[a-zA-Z0-9]*-[a-zA-Z0-9]*-[a-zA-Z0-9]*-[a-zA-Z0-9]-*[a-zA-Z0-9]*-[a-zA-Z0-9]*"' | cut -d\" -f2)"     
+  	ROOTUUID="$(blkid -s UUID -o value $ROOTDISK)"     
 else
-	ROOTUUID="$(blkid | grep $(mount | grep " / " | cut -d" " -f1) | grep -o ' UUID="[a-zA-Z0-9]*-[a-zA-Z0-9]*-[a-zA-Z0-9]*-[a-zA-Z0-9]-*[a-zA-Z0-9]*-[a-zA-Z0-9]*"' | cut -d\" -f2)"
+	ROOTUUID="$(blkid -s UUID -o value $(mount | grep " / " | cut -d" " -f1)"
 fi
 
 if [[ -n $EFIPART ]]; then
