@@ -4,7 +4,7 @@
 if [[ -n $ROOTDISK ]]; then
   	ROOTUUID="$(blkid -s UUID -o value $ROOTDISK)"     
 else
-	ROOTUUID="$(blkid -s UUID -o value $(mount | grep " / " | cut -d" " -f1)"
+	ROOTUUID="$(blkid -s UUID -o value $(mount | grep " / " | cut -d" " -f1))"
 fi
 
 if [[ -n $EFIPART ]]; then
