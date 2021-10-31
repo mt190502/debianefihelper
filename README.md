@@ -35,7 +35,7 @@ or
 
 ## Changelog
 v1.1 : Added systemdboot support
-
-     : Some variables fixed
-     
-     : Script cleaned
+  |
+  |- : Some variables fixed
+  |   
+  \- : Script cleaned
