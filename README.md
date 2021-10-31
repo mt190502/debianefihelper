@@ -19,20 +19,17 @@ sudo install -Dm755 ./efihelper /usr/local/bin/efihelper
 
 ## Usage
 #### Initial setup:
-sudo efihelper first 
-
+```sudo efihelper first```
 
 #### Install new kernel entry:
 ```sudo efihelper install $(uname -r)```
 or
 ```sudo efihelper install 5.14.15-xanmod1```
 
-
 #### Remove kernel entry:
 ```sudo efihelper remove $(uname -r)```
 or
 ```sudo efihelper remove 5.14.15-xanmod1```
-
 
 ## Changelog
 ```
