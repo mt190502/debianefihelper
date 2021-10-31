@@ -153,7 +153,12 @@ initrd\t\t$ninitrd" | tee $EFIDIR/loader/entries/${MACHID}-${1}.conf
 ##################################
 
 removesystemdbootentry(){
-	[[ -e "/boot/efi/loader/entries/${MACHID}-${1}.conf" ]] && rm /boot/efi/loader/entries/${MACHID}-${1}.conf
+	echo "Removing entry (version $1)"
+
+	rm -f $TARGET/$1/{linux,initrd}
+
+	[[ -e "/boot/efi/loader/entries/${MACHID}-${1}.conf" ]] && rm /boot/efi/loader/entries/${MACHID}-${1}.conf;
+	exit 0
 }
 
 
