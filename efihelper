@@ -128,7 +128,7 @@ installsystemdbootentry(){
 	nkernel="/$(cat /etc/machine-id)/$1/linux"
 	ninitrd="/$(cat /etc/machine-id)/$1/initrd"
 
-	[[ ! -d $TARGET/$1 ]] && rm -f $TARGET/$1/{linux,initrd} rm -f $TARGET/$1/{linux,initrd}
+	[[ ! -d $TARGET/$1 ]] && mkdir -p $TARGET/$1 || rm -f $TARGET/$1/{linux,initrd}
 	cp /boot/vmlinuz-$1 $TARGET/$1/linux
 	cp /boot/initrd.img-$1 $TARGET/$1/initrd
 
@@ -153,9 +153,9 @@ initrd\t\t$ninitrd" | tee $EFIDIR/loader/entries/${MACHID}-${1}.conf
 ##################################
 
 removesystemdbootentry(){
-	echo "Removing entry (version $1)"
+	echo "Removing systemdboot entry (version $1)"
 
-	rm -f $TARGET/$1/{linux,initrd}
+	rm -rf $TARGET/$1
 
 	[[ -e "/boot/efi/loader/entries/${MACHID}-${1}.conf" ]] && rm /boot/efi/loader/entries/${MACHID}-${1}.conf;
 	exit 0
@@ -171,7 +171,7 @@ removesystemdbootentry(){
 #############################
 
 removefistubentry(){
-	echo "Removing entry (version $1)"
+	echo "Removing efistub entry (version $1)"
 
         rm -f $TARGET/$1/{linux,initrd}
 	
