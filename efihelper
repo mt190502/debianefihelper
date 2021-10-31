@@ -155,9 +155,9 @@ initrd\t\t$ninitrd" | tee $EFIDIR/loader/entries/${MACHID}-${1}.conf
 removesystemdbootentry(){
 	echo "Removing systemdboot entry (version $1)"
 
-	rm -rf $TARGET/$1
+	[[ -d "$TARGET/$1" ]] && rm -rf $TARGET/$1
+	[[ -e "$TARGET/loader/entries/${MACHID}-${1}.conf" ]] && rm /boot/efi/loader/entries/${MACHID}-${1}.conf
 
-	[[ -e "/boot/efi/loader/entries/${MACHID}-${1}.conf" ]] && rm /boot/efi/loader/entries/${MACHID}-${1}.conf;
 	exit 0
 }
 
@@ -173,9 +173,10 @@ removesystemdbootentry(){
 removefistubentry(){
 	echo "Removing efistub entry (version $1)"
 
-        rm -f $TARGET/$1/{linux,initrd}
-	
+        [[ -d "$TARGET/$1" ]] && rm -f $TARGET/$1/{linux,initrd}
 	[[ -n $(efibootmgr -v | grep $1) ]] && efibootmgr -Bb $(efibootmgr | grep $1 | cut -d '*' -f1 | sed "s/Boot//g")
+	
+	exit 0
 }
 
 
