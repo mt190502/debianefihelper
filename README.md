@@ -9,12 +9,13 @@ Efihelper program, works as boot manager assistant on Debian and Ubuntu based sy
 
 
 ## Install
+```
 git clone (this repo)
 
 cd debianefistubhelper
 
 sudo install -Dm755 ./efihelper /usr/local/bin/efihelper
-
+```
 
 ## Usage
 #### Initial setup:
