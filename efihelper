@@ -210,7 +210,7 @@ Do you want to uninstall grub? (If you wish, you can then reinstall Grub and uni
 
 
 	if [[ -e "/etc/debianefihelper.conf" ]]; then
-		echo "Config file is available in /etc.\nDo you want to continue?\nPress <Enter> to continue or press <Ctrl+C> to cancel operation"
+		echo -e "Config file is available in /etc.\nDo you want to continue?\nPress <Enter> to continue or press <Ctrl+C> to cancel operation"
 		read
 	fi
 
