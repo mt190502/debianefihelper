@@ -138,7 +138,7 @@ installsystemdbootentry(){
 title\t\t$NAME - ($DISTCODENAME)\n\
 version\t\t$1\n\
 machine-id\t$MACHID\n\
-options\t\t$PARAMS\n\
+options\t\troot=UUID=$ROOTUUID $PARAMS\n\
 linux\t\t$nkernel\n\
 initrd\t\t$ninitrd" | tee $EFIDIR/loader/entries/${MACHID}-${1}.conf
 	exit
