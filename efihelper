@@ -96,6 +96,20 @@ TARGET="$EFIDIR/$(cat /etc/machine-id)"
 
 #############################
 #
+## COPY FILES TO ESP
+#
+#############################
+
+copyfilestoesp(){
+	[[ ! -d $TARGET/$1 ]] && mkdir -p $TARGET/$1 || rm -f $TARGET/$1/{linux,initrd}
+	cp /boot/vmlinuz-$1 $TARGET/$1/linux
+	cp /boot/initrd.img-$1 $TARGET/$1/initrd
+}
+
+
+
+#############################
+#
 ## INSTALL ENTRY via EFISTUB
 #
 #############################
@@ -105,9 +119,7 @@ installefistubentry(){
 	nkernel="/$(cat /etc/machine-id)/$1/linux"
 	ninitrd="\\$(cat /etc/machine-id)\$1\initrd"
 
-	[[ ! -d $TARGET/$1 ]] && mkdir -p $TARGET/$1 || rm -f $TARGET/$1/{linux,initrd}
-	cp /boot/vmlinuz-$1 $TARGET/$1/linux
-	cp /boot/initrd.img-$1 $TARGET/$1/initrd
+	copyfilestoesp $1
 	
 	[[ -n "$(efibootmgr | grep $1)" ]] && efibootmgr -Bb $(efibootmgr | grep $1 | cut -d '*' -f1 | sed "s/Boot//g")
 
@@ -130,9 +142,7 @@ installsystemdbootentry(){
 	nkernel="/$(cat /etc/machine-id)/$1/linux"
 	ninitrd="/$(cat /etc/machine-id)/$1/initrd"
 
-	[[ ! -d $TARGET/$1 ]] && mkdir -p $TARGET/$1 || rm -f $TARGET/$1/{linux,initrd}
-	cp /boot/vmlinuz-$1 $TARGET/$1/linux
-	cp /boot/initrd.img-$1 $TARGET/$1/initrd
+	copyfilestoesp $1
 
 	[[ ! -n "$(efibootmgr | grep 'Linux')" ]] && bootctl install
 
@@ -175,7 +185,7 @@ removesystemdbootentry(){
 removefistubentry(){
 	echo "Removing efistub entry (version $1)"
 
-        [[ -d "$TARGET/$1" ]] && rm -f $TARGET/$1/{linux,initrd}
+	[[ -d "$TARGET/$1" ]] && rm -f $TARGET/$1/{linux,initrd}
 	[[ -n $(efibootmgr -v | grep $1) ]] && efibootmgr -Bb $(efibootmgr | grep $1 | cut -d '*' -f1 | sed "s/Boot//g")
 	
 	exit 0
@@ -216,10 +226,22 @@ Do you want to uninstall grub? (If you wish, you can then reinstall Grub and uni
 		read
 	fi
 
-	echo -e '#!/bin/bash\n/usr/local/bin/efihelper install $1' > /etc/kernel/postinst.d/zz-efihelper
-	chmod +x /etc/kernel/postinst.d/zz-efihelper
-        echo -e '#!/bin/bash\n/usr/local/bin/efihelper remove $1' > /etc/kernel/postrm.d/zz-efihelper
-	chmod +x /etc/kernel/postrm.d/zz-efihelper
+	SELF="$(readlink -f $0)"
+
+	if [[ ! -e "/etc/kernel/postinst.d/zz-efihelper"  ]]; then
+		echo -e '#!/bin/bash\n'$SELF' install $1' > /etc/kernel/postinst.d/zz-efihelper
+		chmod +x /etc/kernel/postinst.d/zz-efihelper
+	fi
+
+	if [[ ! -e "/etc/kernel/postrm.d/zz-efihelper"  ]]; then
+		echo -e '#!/bin/bash\n'$SELF' remove $1' > /etc/kernel/postrm.d/zz-efihelper
+		chmod +x /etc/kernel/postrm.d/zz-efihelper
+	fi
+
+	if [[ ! -e "/etc/initramfs/post-update.d/zz-efihelper"  ]]; then
+		echo -e '#!/bin/bash\n'$SELF' update $1' > /etc/initramfs/post-update.d/zz-efihelper
+		chmod +x /etc/initramfs/post-update.d/zz-efihelper
+	fi
 
 	FILEVARIABLES='################################################\n#\n## BootLoader Method (systemdboot or efistub)\n## EFI partition directory (/boot or /boot/efi)\n#\n################################################\n'
 	FILEVARIABLES+='METHOD="systemdboot"\n'
@@ -268,6 +290,10 @@ case $1 in
 			echo "Current method is missing, please set the METHOD environment in /etc/debianefihelper.conf file."
 			exit
 		fi
+	;;
+	update)
+		echo "Updating files (version $1)"
+		copyfilestoesp $2
 	;;
 	first)
 		firstsetup
