@@ -292,7 +292,7 @@ case $1 in
 		fi
 	;;
 	update)
-		echo "Updating files (version $1)"
+		echo "Updating files (version $2)"
 		copyfilestoesp $2
 	;;
 	first)
