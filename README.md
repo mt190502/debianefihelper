@@ -12,7 +12,7 @@ Efihelper program, works as boot manager assistant on Debian and Ubuntu based sy
 ```
 git clone (this repo)
 
-cd debianefistubhelper
+cd debianefihelper
 
 sudo install -Dm755 ./efihelper /usr/local/bin/efihelper
 ```
@@ -33,6 +33,13 @@ or
 
 ## Changelog
 ```
+v1.2 : Fix to EFISTUB support with initramfs
+ |-> : New hook for initramfs rebuild
+ |-> : Remove empty version directory when removing EFISTUB files
+ |-> : Hide `efibootmgr` output
+ |-> :  Don't recreate the hooks if they already exist
+ \-> : debian/ directory so it can be packaged to a `.deb` file
+
 v1.1 : Added systemdboot support
  |-> : Some variables fixed
  \-> : Script cleaned
