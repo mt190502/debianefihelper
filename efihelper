@@ -121,9 +121,9 @@ installefistubentry(){
 
 	copyfilestoesp $1
 	
-	[[ -n "$(efibootmgr | grep $1)" ]] && efibootmgr -Bb $(efibootmgr | grep $1 | cut -d '*' -f1 | sed "s/Boot//g")
+	[[ -n "$(efibootmgr | grep $1)" ]] && efibootmgr -qBb $(efibootmgr | grep $1 | cut -d '*' -f1 | sed "s/Boot//g")
 
-	efibootmgr -d $EFIPART \
+	efibootmgr -q -d $EFIPART \
 		-c -L "$NAME - ($DISTCODENAME) ($1)" \
 		-l $nkernel \
 		-u "root=UUID=$ROOTUUID initrd=$ninitrd $PARAMS" -v
@@ -186,7 +186,7 @@ removefistubentry(){
 	echo "Removing efistub entry (version $1)"
 
 	[[ -d "$TARGET/$1" ]] && rm -f $TARGET/$1/{linux,initrd}
-	[[ -n $(efibootmgr -v | grep $1) ]] && efibootmgr -Bb $(efibootmgr | grep $1 | cut -d '*' -f1 | sed "s/Boot//g")
+	[[ -n $(efibootmgr -v | grep $1) ]] && efibootmgr -qBb $(efibootmgr | grep $1 | cut -d '*' -f1 | sed "s/Boot//g")
 	[[ -z "$(ls -A $TARGET/$1)" ]] && rmdir $TARGET/$1
 	
 	exit 0
