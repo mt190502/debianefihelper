@@ -291,8 +291,16 @@ case $1 in
 		fi
 	;;
 	update)
-		echo "Updating files (version $2)"
-		copyfilestoesp $2
+		if [[ $METHOD == "systemdboot" ]]; then
+			echo "Updating files (version $2)"
+			copyfilestoesp $2
+		elif [[ $METHOD == "efistub" ]]; then
+			echo "Updating files (version $2)"
+			copyfilestoesp $2
+		else
+			echo "Current method is missing, please set the METHOD environment in /etc/debianefihelper.conf file."
+			exit
+		fi
 	;;
 	first)
 		firstsetup
