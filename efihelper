@@ -117,7 +117,7 @@ copyfilestoesp(){
 installefistubentry(){
 	echo "Installing new entry (version $1)"
 	nkernel="/$(cat /etc/machine-id)/$1/linux"
-	ninitrd="\\$(cat /etc/machine-id)\$1\initrd"
+	ninitrd="\\$(cat /etc/machine-id)\\$1\\initrd"
 
 	copyfilestoesp $1
 	
