@@ -250,7 +250,8 @@ Do you want to uninstall grub? (If you wish, you can then reinstall Grub and uni
 	FILEVARIABLES+="EFIPART=\"$EFIPART\"\n"
 	FILEVARIABLES+="MACHID=\"$(cat /etc/machine-id)\"\n"
 	FILEVARIABLES+="NAME=\"$(lsb_release -i | awk '{print $3}') Linux $(lsb_release -r | awk '{print $2}')\"\n\n"
-	FILEVARIABLES+="if [[ \"\$(lsb_release -c | awk '{print \$2}')\" == \"impish\"  ]]; then\n\tDISTCODENAME='Impish Indri'\n\
+	FILEVARIABLES+="if [[ \"\$(lsb_release -c | awk '{print \$2}')\" == \"jammy\"  ]]; then\n\tDISTCODENAME='Jammy Jelfish'\n\
+elif [[ \"\$(lsb_release -c | awk '{print \$2}')\" == \"impish\"  ]]; then\n\tDISTCODENAME='Impish Indri'\n\
 elif [[ \"\$(lsb_release -c | awk '{print \$2}')\" == \"hirsute\"  ]]; then\n\tDISTCODENAME='Hirsute'\n\
 elif [[ \"\$(lsb_release -c | awk '{print \$2}')\" == \"focal\"  ]]; then\n\tDISTCODENAME='Focal Fossa'\n\
 elif [[ \"\$(lsb_release -c | awk '{print \$2}')\" == \"bionic\"  ]]; then\n\tDISTCODENAME='Bionic Beaver'\n\
