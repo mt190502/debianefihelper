@@ -69,8 +69,9 @@ fi
 #
 #############################
 
+[[ ! -n $EFIDIR ]] && EFIDIR="/boot/efi"
 if [[ ! -n $EFIPART ]]; then
-	if [[ -n "$(findmnt /boot/efi | grep dev | grep -oi nvme)" ]]; then
+	if [[ -n "$(findmnt $EFIDIR | grep dev | grep -oi nvme)" ]]; then
 		EFIPART="$(findmnt $EFIDIR | grep dev | awk '{print $2}' | sed 's/p/ -p /g')"
 	elif [[ -n "$(findmnt $EFIDIR | grep dev | awk '{print $2}' | grep -o sd)" ]]; then
 		disk="$(findmnt $EFIDIR | grep dev | awk '{print $2}' | cut -d "/" -f3 | grep -o '[a-z]*')"
