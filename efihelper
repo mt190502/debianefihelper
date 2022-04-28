@@ -228,16 +228,19 @@ Do you want to uninstall grub? (If you wish, you can then reinstall Grub and uni
 	fi
 
 	if [[ ! -e "/etc/kernel/postinst.d/zz-efihelper"  ]]; then
+		mkdir -p /etc/kernel/postinst.d >/dev/null
 		echo -e '#!/bin/bash\n/usr/local/bin/efihelper install $1' > /etc/kernel/postinst.d/zz-efihelper
 		chmod +x /etc/kernel/postinst.d/zz-efihelper
 	fi
 
 	if [[ ! -e "/etc/kernel/postrm.d/zz-efihelper"  ]]; then
+		mkdir -p /etc/kernel/postrm.d >/dev/null
 		echo -e '#!/bin/bash\n/usr/local/bin/efihelper remove $1' > /etc/kernel/postrm.d/zz-efihelper
 		chmod +x /etc/kernel/postrm.d/zz-efihelper
 	fi
 
 	if [[ ! -e "/etc/initramfs/post-update.d/zz-efihelper"  ]]; then
+		mkdir -p /etc/initramfs/post-update.d >/dev/null
 		echo -e '#!/bin/bash\n/usr/local/bin/efihelper update $1' > /etc/initramfs/post-update.d/zz-efihelper
 		chmod +x /etc/initramfs/post-update.d/zz-efihelper
 	fi
