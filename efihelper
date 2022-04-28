@@ -70,14 +70,14 @@ fi
 #############################
 
 if [[ ! -n $EFIPART ]]; then
-	if [[ -n "$(blkid | grep EFI | cut -d':' -f1 | grep -o nvme)" ]]; then
-		EFIPART="$(blkid | grep EFI | cut -d':' -f1 | sed 's/p/ -p /g')"
-	elif [[ -n "$(blkid | grep EFI | cut -d':' -f1 | grep -o sd)" ]]; then
-		disk="$(blkid | grep EFI | cut -d':' -f1 | cut -d "/" -f3 | grep -o '[a-z]*')"
-		part="$(blkid | grep EFI | cut -d':' -f1 | cut -d "/" -f3 | grep -o '[0-9]*')"
+	if [[ -n "$(findmnt /boot/efi | grep dev | grep -oi nvme)" ]]; then
+		EFIPART="$(findmnt $EFIDIR | grep dev | awk '{print $2}' | sed 's/p/ -p /g')"
+	elif [[ -n "$(findmnt $EFIDIR | grep dev | awk '{print $2}' | grep -o sd)" ]]; then
+		disk="$(findmnt $EFIDIR | grep dev | awk '{print $2}' | cut -d "/" -f3 | grep -o '[a-z]*')"
+		part="$(findmnt $EFIDIR | grep dev | awk '{print $2}' | cut -d "/" -f3 | grep -o '[0-9]*')"
 		EFIPART="/dev/$disk -p $part"
-	elif [[ -n "$(blkid | grep EFI | cut -d':' -f1 | grep -o mmcblk)" ]]; then
-		EFIPART="$(blkid | grep EFI | cut -d":" -f1 | sed 's/p/ -p /g')"
+	elif [[ -n "$(findmnt $EFIDIR | grep dev | awk '{print $2}' | grep -o mmcblk)" ]]; then
+		EFIPART="$(findmnt $EFIDIR | grep dev | awk '{print $2}' | sed 's/p/ -p /g')"
 	fi
 fi
 
