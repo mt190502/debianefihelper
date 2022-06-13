@@ -58,7 +58,7 @@ checkprogram(){
 if [[ -n $ROOTDISK ]]; then
   	ROOTUUID="$(blkid -s UUID -o value $ROOTDISK)"
 else
-	ROOTUUID="$(blkid -s UUID -o value $(mount | grep ' / ' | cut -d' ' -f1))"
+	ROOTUUID="$(findmnt / -o UUID | tail -n 1)"
 fi
 
 
@@ -97,7 +97,7 @@ TARGET="$EFIDIR/$(cat /etc/machine-id)"
 
 #############################
 #
-## COPY FILES TO ESP
+## COPY FILES TO ESPDIR
 #
 #############################
 
